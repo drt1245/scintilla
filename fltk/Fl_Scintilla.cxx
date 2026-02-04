@@ -228,7 +228,10 @@ static Scintilla::KeyMod get_modifiers()
 
 Scintilla::Internal::Point Fl_Scintilla::get_mouse_position()
 {
-	return Scintilla::Internal::Point(Fl::event_x() - x(), Fl::event_y() - y());
+	return Scintilla::Internal::Point(
+		Fl::event_x() - x(),
+		Fl::event_y() - y()
+	);
 }
 
 int Fl_Scintilla::handle(int event)
@@ -267,7 +270,7 @@ int Fl_Scintilla::handle(int event)
 		break;
 	case FL_KEYDOWN:
 		bool consumed;
-		const int key = Fl::event_key();
+		int key = Fl::event_key();
 		const bool added = KeyDownWithModifiers(fl_keys_to_scintilla(key), get_modifiers(), &consumed);
 		if (added)
 			printf("Added\n");
@@ -275,15 +278,15 @@ int Fl_Scintilla::handle(int event)
 			printf("Consumed\n");
 		if (added || consumed)
 		{
-			redraw();
-			return true;
+			//redraw();
+			//return true;
 		}
+		if (key >= FL_KP && key < FL_KP_Last)
+			key -= FL_KP;
 		if (key >= ' ' && key <= '~') //printable ascii characters
 		{
-			//const char c = key;
-			//const Sci::Position len = pdoc->InsertString(CurrentPosition(), &c, 1);
-			//if (len > 0)
-				//MovePositionTo(CurrentPosition() + len);
+			if (Fl::event_shift())
+				key = toupper(key);
 			AddChar(key);
 			redraw();
 			return true;
