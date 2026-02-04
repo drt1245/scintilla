@@ -667,16 +667,15 @@ void SurfaceFLTK::MeasureWidths(const Font* font_, const std::string_view text, 
 {
 	if (const FontFLTK* font = dynamic_cast<const FontFLTK*>(font_); font)
 		fl_font(font->font, font->size);
-	int len;
 	printf("MeasureWidths(%.*s) = [", (int)text.size(), text.data());
-	for (const char* s = text.data(); s < text.data() + text.size(); s += len)
+	for (const char* s = text.data(); s < text.data() + text.size();)
 	{
-		fl_utf8decode(s, text.data() + text.size(), &len);
-		int dx, dy, w, h;
-		fl_text_extents(text.data(), s + len - text.data(), dx, dy, w, h);
+		const int len = fl_utf8len1(*s);
+		const int w = fl_width(text.data(), s + len - text.data());
 		printf("%d ", w);
 		for (size_t j = 0; j < len; ++j)
 			positions[(s - text.data()) + j] = w;
+		s += len;
 	}
 	printf("]\n");
 }
@@ -685,8 +684,7 @@ XYPOSITION SurfaceFLTK::WidthText(const Font* font_, const std::string_view text
 {
 	if (const FontFLTK* font = dynamic_cast<const FontFLTK*>(font_); font)
 		fl_font(font->font, font->size);
-	int dx, dy, w, h;
-	fl_text_extents(text.data(), text.size(), dx, dy, w, h);
+	const int w = fl_width(text.data(), text.size());
 	printf("WidthText(%.*s) = %d\n", (int)text.size(), text.data(), w);
 	return w;
 }
