@@ -217,6 +217,20 @@ static Scintilla::Keys fl_keys_to_scintilla(const int key)
 	}
 }
 
+static Scintilla::KeyMod get_modifiers()
+{
+	const Scintilla::KeyMod ctrl = Fl::event_ctrl() ? Scintilla::KeyMod::Ctrl : Scintilla::KeyMod::Norm;
+	const Scintilla::KeyMod alt = Fl::event_alt() ? Scintilla::KeyMod::Alt : Scintilla::KeyMod::Norm;
+	const Scintilla::KeyMod shift = Fl::event_shift() ? Scintilla::KeyMod::Shift : Scintilla::KeyMod::Norm;
+	const Scintilla::KeyMod meta = Fl::event_state(FL_META) ? Scintilla::KeyMod::Meta : Scintilla::KeyMod::Norm;
+	return ctrl | alt | shift | meta;
+}
+
+Scintilla::Internal::Point Fl_Scintilla::get_mouse_position()
+{
+	return Scintilla::Internal::Point(Fl::event_x() - x(), Fl::event_y() - y());
+}
+
 int Fl_Scintilla::handle(int event)
 {
 	switch (Fl::event())
@@ -227,14 +241,34 @@ int Fl_Scintilla::handle(int event)
 	case FL_UNFOCUS:
 		SetFocusState(false);
 		return true;
+	case FL_PUSH:
+		switch (Fl::event_button())
+		{
+		case FL_LEFT_MOUSE:
+			ButtonDownWithModifiers(get_mouse_position(), 0, get_modifiers());
+			return true;
+		case FL_RIGHT_MOUSE:
+			RightButtonDownWithModifiers(get_mouse_position(), 0, get_modifiers());
+		}
+		break;
+	case FL_RELEASE:
+		if (Fl::event_button() == FL_LEFT_MOUSE)
+		{
+			ButtonUpWithModifiers(get_mouse_position(), 0, get_modifiers());
+			return true;
+		}
+		break;
+	case FL_DRAG:
+		if (Fl::event_button() == FL_LEFT_MOUSE)
+		{
+			ButtonMoveWithModifiers(get_mouse_position(), 0, get_modifiers());
+			return true;
+		}
+		break;
 	case FL_KEYDOWN:
-		const Scintilla::KeyMod ctrl = Fl::event_ctrl() ? Scintilla::KeyMod::Ctrl : Scintilla::KeyMod::Norm;
-		const Scintilla::KeyMod alt = Fl::event_alt() ? Scintilla::KeyMod::Alt : Scintilla::KeyMod::Norm;
-		const Scintilla::KeyMod shift = Fl::event_shift() ? Scintilla::KeyMod::Shift : Scintilla::KeyMod::Norm;
-		const Scintilla::KeyMod meta = Fl::event_state(FL_META) ? Scintilla::KeyMod::Meta : Scintilla::KeyMod::Norm;
 		bool consumed;
 		const int key = Fl::event_key();
-		const bool added = KeyDownWithModifiers(fl_keys_to_scintilla(key), ctrl | alt | shift | meta, &consumed);
+		const bool added = KeyDownWithModifiers(fl_keys_to_scintilla(key), get_modifiers(), &consumed);
 		if (added)
 			printf("Added\n");
 		if (consumed)
