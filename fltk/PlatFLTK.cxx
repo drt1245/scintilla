@@ -51,7 +51,7 @@ PRectangle Window::GetPosition() const
 {
 	if (const Fl_Widget* w = static_cast<const Fl_Widget*>(wid); w)
 	{
-		printf("GetPosition(%d, %d, %d, %d) %p\n", w->x(), w->y(), w->w(), w->h(), w);
+		//printf("GetPosition(%d, %d, %d, %d) %p\n", w->x(), w->y(), w->w(), w->h(), w);
 		return PRectangle(0, 0, w->w() - 15, w->h() - 15);
 		//return PRectangle(w->x(), w->y(), w->x() + w->w(), w->y() + w->h());
 	}
@@ -61,7 +61,7 @@ PRectangle Window::GetPosition() const
 
 void Window::SetPosition(const PRectangle rc)
 {
-	printf("SetPosition(%lf, %lf, %lf, %lf)\n", rc.left, rc.top, rc.Width(), rc.Height());
+	//printf("SetPosition(%lf, %lf, %lf, %lf)\n", rc.left, rc.top, rc.Width(), rc.Height());
 	if (Fl_Widget* w = static_cast<Fl_Widget*>(wid); w)
 		w->resize(lround(rc.left), lround(rc.top), lround(rc.Width()), lround(rc.Height()));
 }
@@ -72,7 +72,7 @@ void Window::SetPositionRelative(const PRectangle rc, const Window* relativeTo)
 		Fl_Widget* w = (Fl_Widget*)wid,
 		         * parent = (Fl_Widget*)relativeTo->wid;
 		w->resize(lround(rc.left) + parent->x(), lround(rc.top) + parent->y(), lround(rc.Width()), lround(rc.Height()));
-		printf("SetPositionRelative(%lf, %lf, %lf, %lf) %p\n", rc.left + parent->x(), rc.top + parent->y(), rc.Width(), rc.Height(), w);
+		//printf("SetPositionRelative(%lf, %lf, %lf, %lf) %p\n", rc.left + parent->x(), rc.top + parent->y(), rc.Width(), rc.Height(), w);
 	}
 }
 
@@ -145,7 +145,7 @@ PRectangle Window::GetMonitorRect(const Point pt)
 		Fl::screen_xywh(X, Y, W, H, w->x() + lround(pt.x), w->y() + lround(pt.y));
 	else
 		Fl::screen_xywh(X, Y, W, H);
-	printf("GetMonitorRect(%lf, %lf) = [%d, %d, %d, %d]\n", pt.x, pt.y, X, Y, W, H);
+	//printf("GetMonitorRect(%lf, %lf) = [%d, %d, %d, %d]\n", pt.x, pt.y, X, Y, W, H);
 	return PRectangle::FromInts(X, Y, X + W, Y + H);
 }
 
@@ -231,7 +231,7 @@ void ListBoxFLTK::SetFont(const Font* font) {
 
 void ListBoxFLTK::Create(Window& parent, int ctrlID, Point location, int lineHeight, bool, Technology)
 {
-	printf("ListBoxFLTK::Create()\n");
+	//printf("ListBoxFLTK::Create()\n");
 	if (Fl_Widget* w = (Fl_Widget*)parent.GetID(); w)
 		Fl_Select_Browser* browser = new Fl_Select_Browser(lround(location.x), lround(location.y), 90, 90); //TODO: width/height
 }
@@ -450,7 +450,7 @@ public:
 
 void SurfaceFLTK::SetMode(SurfaceMode mode)
 {
-	printf("SetMode(%d)\n", mode.codePage);
+	//printf("SetMode(%d)\n", mode.codePage);
 }
 
 void SurfaceFLTK::Release() noexcept
@@ -459,7 +459,7 @@ void SurfaceFLTK::Release() noexcept
 
 int SurfaceFLTK::SupportsFeature(const Supports feature) noexcept
 {
-	printf("SupportsFeature(%u)\n", (unsigned int)feature);
+	//printf("SupportsFeature(%u)\n", (unsigned int)feature);
 	switch (feature)
 	{
 	case Supports::LineDrawsFinal: return 0;
@@ -476,7 +476,7 @@ int SurfaceFLTK::LogPixelsY()
 {
 	float x, y;
 	Fl::screen_dpi(x, y); //TODO: use correct screen number
-	printf("LogPixelsY() = %f\n", y);
+	//printf("LogPixelsY() = %f\n", y);
 	return lroundf(y);
 }
 
@@ -487,13 +487,13 @@ int SurfaceFLTK::PixelDivisions()
 
 int SurfaceFLTK::DeviceHeightFont(const int points)
 {
-	printf("DeviceHeightFont(%d)\n", points);
+	//printf("DeviceHeightFont(%d)\n", points);
 	return points;
 }
 
 void SurfaceFLTK::LineDraw(const Point start, const Point end, const Stroke stroke)
 {
-	printf("LineDraw(%lf, %lf, %lf, %lf)\n", start.x, start.y, end.x, end.y);
+	//printf("LineDraw(%lf, %lf, %lf, %lf)\n", start.x, start.y, end.x, end.y);
 	fl_color(stroke.colour.GetRed(), stroke.colour.GetGreen(), stroke.colour.GetBlue()); //TODO: fltk does not support transparency
 	fl_line_style(0, lround(stroke.width));
 	fl_line(lround(start.x), lround(start.y), lround(end.x), lround(end.y));
@@ -501,25 +501,25 @@ void SurfaceFLTK::LineDraw(const Point start, const Point end, const Stroke stro
 
 void SurfaceFLTK::PolyLine(const std::ranges::forward_range auto& pts, const Stroke stroke)
 {
-	printf("Polyline(");
+	//printf("Polyline(");
 	fl_color(stroke.colour.GetRed(), stroke.colour.GetGreen(), stroke.colour.GetBlue()); //TODO: fltk does not support transparency
 	fl_line_style(0, lround(stroke.width));
 	// TODO: set line joins and caps
 	for (size_t i = 1; i < pts.size(); ++i)
 		fl_line(lround(pts[i - 1].x), lround(pts[i - 1].y), lround(pts[i].x), lround(pts[i].y));
-	printf(")\n");
+	//printf(")\n");
 }
 
 void SurfaceFLTK::Polygon(const std::ranges::forward_range auto& pts, const FillStroke fillstroke)
 {
-	printf("Polygon(");
+	//printf("Polygon(");
 	fl_color(fillstroke.fill.colour.GetRed(), fillstroke.fill.colour.GetGreen(), fillstroke.fill.colour.GetBlue()); //TODO: fltk does not support transparency
 	fl_begin_polygon(); //TODO: use fl_begin_complex_polygon?
 	for (const auto& pt : pts)
 		fl_vertex(lround(pt.x), lround(pt.y));
 	fl_end_polygon();
 	PolyLine(pts, fillstroke.stroke);
-	printf(")\n");
+	//printf(")\n");
 }
 
 void SurfaceFLTK::RectangleDraw(PRectangle rect, FillStroke fillstroke)
@@ -533,19 +533,19 @@ void SurfaceFLTK::RectangleFrame(const PRectangle rect, const Stroke stroke)
 	fl_color(stroke.colour.GetRed(), stroke.colour.GetGreen(), stroke.colour.GetBlue()); //TODO: fltk does not support transparency
 	fl_line_style(0, lround(stroke.width));
 	fl_rect(lround(rect.left), lround(rect.top), lround(rect.Width()), lround(rect.Height()));
-	printf("RectangleFrame(%lf, %lf, %lf, %lf)\n", rect.left, rect.top, rect.Width(), rect.Height());
+	//printf("RectangleFrame(%lf, %lf, %lf, %lf)\n", rect.left, rect.top, rect.Width(), rect.Height());
 }
 
 void SurfaceFLTK::FillRectangle(const PRectangle rect, const Fill fill)
 {
 	fl_color(fill.colour.GetRed(), fill.colour.GetGreen(), fill.colour.GetBlue()); //TODO: fltk does not support transparency
 	fl_rectf(lround(rect.left), lround(rect.top), lround(rect.Width()), lround(rect.Height()));
-	printf("FillRectangle([%lf, %lf, %lf, %lf], [%d, %d, %d])\n", rect.left, rect.top, rect.Width(), rect.Height(), fill.colour.GetRed(), fill.colour.GetGreen(), fill.colour.GetBlue());
+	//printf("FillRectangle([%lf, %lf, %lf, %lf], [%d, %d, %d])\n", rect.left, rect.top, rect.Width(), rect.Height(), fill.colour.GetRed(), fill.colour.GetGreen(), fill.colour.GetBlue());
 }
 
 void SurfaceFLTK::FillRectangle(const PRectangle rect, Surface& surfacePattern)
 {
-	printf("PatternRectangle(%lf, %lf, %lf, %lf)\n", rect.left, rect.top, rect.Width(), rect.Height());
+	//printf("PatternRectangle(%lf, %lf, %lf, %lf)\n", rect.left, rect.top, rect.Width(), rect.Height());
 	if (SurfaceOffscreen* pattern = dynamic_cast<SurfaceOffscreen*>(&surfacePattern); pattern)
 		for (double x = rect.left; x < rect.right; x += pattern->surf.image()->w())
 			for (double y = rect.top; y < rect.bottom; y += pattern->surf.image()->h())
@@ -572,7 +572,7 @@ void SurfaceFLTK::AlphaRectangle(const PRectangle rect, const XYPOSITION cornerS
 	fl_color(fillstroke.stroke.colour.GetRed(), fillstroke.stroke.colour.GetGreen(), fillstroke.stroke.colour.GetBlue()); //TODO: fltk does not support transparency
 	fl_line_style(0, lround(fillstroke.stroke.width));
 	fl_rounded_rect(lround(rect.left), lround(rect.top), lround(rect.Width()), lround(rect.Height()), lround(cornerSize));
-	printf("AlphaRectangle(%lf, %lf, %lf, %lf)\n", rect.left, rect.top, rect.Width(), rect.Height());
+	//printf("AlphaRectangle(%lf, %lf, %lf, %lf)\n", rect.left, rect.top, rect.Width(), rect.Height());
 }
 
 void SurfaceFLTK::GradientRectangle(const PRectangle rect, const std::vector<ColourStop>& stops, const GradientOptions)
@@ -584,13 +584,13 @@ void SurfaceFLTK::GradientRectangle(const PRectangle rect, const std::vector<Col
 void SurfaceFLTK::DrawRGBAImage(const PRectangle rect, const int width, const int height, const unsigned char* pixelsImage)
 {
 	//TODO: fltk does not support transparency
-	printf("DrawRGBAImage(%lf, %lf, %lf, %lf, %d, %d)\n", rect.left, rect.top, rect.Width(), rect.Height(), width, height);
+	//printf("DrawRGBAImage(%lf, %lf, %lf, %lf, %d, %d)\n", rect.left, rect.top, rect.Width(), rect.Height(), width, height);
 	fl_draw_image(pixelsImage, lround(rect.left), lround(rect.top), width, height, 4); //TODO: scale image to fit inside rectangle
 }
 
 void SurfaceFLTK::Ellipse(const PRectangle rect, const FillStroke fillstroke)
 {
-	printf("Ellipse(%lf, %lf, %lf, %lf)\n", rect.left, rect.top, rect.Width(), rect.Height());
+	//printf("Ellipse(%lf, %lf, %lf, %lf)\n", rect.left, rect.top, rect.Width(), rect.Height());
 	fl_color(fillstroke.fill.colour.GetRed(), fillstroke.fill.colour.GetGreen(), fillstroke.fill.colour.GetBlue()); //TODO: transparency
 	fl_pie(lround(rect.left), lround(rect.top), lround(rect.Width()), lround(rect.Height()), 0, 360);
 
@@ -607,7 +607,7 @@ void SurfaceFLTK::Stadium(const PRectangle rect, const FillStroke fillstroke, co
 
 void SurfaceFLTK::Copy(const PRectangle rect, const Point from, Surface& src_)
 {
-	printf("Copy([%lf, %lf, %lf, %lf], [%lf, %lf])\n", rect.left, rect.top, rect.Width(), rect.Height(), from.x, from.y);
+	//printf("Copy([%lf, %lf, %lf, %lf], [%lf, %lf])\n", rect.left, rect.top, rect.Width(), rect.Height(), from.x, from.y);
 	if (SurfaceOffscreen* src = dynamic_cast<SurfaceOffscreen*>(&src_); src)
 		src->surf.image()->draw(lround(rect.left), lround(rect.top), lround(rect.Width()), lround(rect.Height()), lround(from.x), lround(from.y));
 	else
@@ -634,7 +634,7 @@ void SurfaceFLTK::DrawTextTransparent(const PRectangle rect, const Font* font_, 
 		fl_font(font->font, font->size);
 	fl_color(fore.GetRed(), fore.GetGreen(), fore.GetBlue());
 	fl_draw(text.data(), text.size(), lround(rect.left), lround(rect.bottom) - fl_descent()); //TODO: use rect width/height?
-	printf("DrawText(%lf, %lf, %lf, %.*s)\n", rect.left, rect.bottom, ybase, (int)text.size(), text.data());
+	//printf("DrawText(%lf, %lf, %lf, %.*s)\n", rect.left, rect.bottom, ybase, (int)text.size(), text.data());
 }
 
 void SurfaceFLTK::DrawTextNoClipUTF8(const PRectangle rect, const Font* font_, const XYPOSITION ybase, const std::string_view text, const ColourRGBA fore, const ColourRGBA back)
@@ -655,7 +655,7 @@ void SurfaceFLTK::DrawTextTransparentUTF8(const PRectangle rect, const Font* fon
 void SurfaceFLTK::SetClip(const PRectangle rect)
 {
 	fl_push_clip(lround(rect.left), lround(rect.top), lround(rect.Width()), lround(rect.Height()));
-	printf("SetClip(%lf, %lf, %lf, %lf)\n", rect.left, rect.top, rect.Width(), rect.Height());
+	//printf("SetClip(%lf, %lf, %lf, %lf)\n", rect.left, rect.top, rect.Width(), rect.Height());
 }
 
 std::unique_ptr<IScreenLineLayout> SurfaceFLTK::Layout(const IScreenLine*)
@@ -667,17 +667,17 @@ void SurfaceFLTK::MeasureWidths(const Font* font_, const std::string_view text, 
 {
 	if (const FontFLTK* font = dynamic_cast<const FontFLTK*>(font_); font)
 		fl_font(font->font, font->size);
-	printf("MeasureWidths(%.*s) = [", (int)text.size(), text.data());
+	//printf("MeasureWidths(%.*s) = [", (int)text.size(), text.data());
 	for (const char* s = text.data(); s < text.data() + text.size();)
 	{
 		const int len = fl_utf8len1(*s);
 		const int w = fl_width(text.data(), s + len - text.data());
-		printf("%d ", w);
+		//printf("%d ", w);
 		for (size_t j = 0; j < len; ++j)
 			positions[(s - text.data()) + j] = w;
 		s += len;
 	}
-	printf("]\n");
+	//printf("]\n");
 }
 
 XYPOSITION SurfaceFLTK::WidthText(const Font* font_, const std::string_view text)
@@ -685,7 +685,7 @@ XYPOSITION SurfaceFLTK::WidthText(const Font* font_, const std::string_view text
 	if (const FontFLTK* font = dynamic_cast<const FontFLTK*>(font_); font)
 		fl_font(font->font, font->size);
 	const int w = fl_width(text.data(), text.size());
-	printf("WidthText(%.*s) = %d\n", (int)text.size(), text.data(), w);
+	//printf("WidthText(%.*s) = %d\n", (int)text.size(), text.data(), w);
 	return w;
 }
 
@@ -724,7 +724,7 @@ XYPOSITION SurfaceFLTK::Height(const Font* font_)
 	if (const FontFLTK* font = dynamic_cast<const FontFLTK*>(font_); font)
 	{
 		fl_font(font->font, font->size);
-		printf("Height(%d, %d) = %d\n", font->font, font->size, fl_height());
+		//printf("Height(%d, %d) = %d\n", font->font, font->size, fl_height());
 	}
 	return fl_height();
 }
@@ -738,7 +738,7 @@ XYPOSITION SurfaceFLTK::AverageCharWidth(const Font* font_)
 
 std::unique_ptr<Surface> SurfaceFLTK::AllocatePixMap(const int width, const int height)
 {
-	printf("AllocatePixMap(%d, %d)\n", width, height);
+	//printf("AllocatePixMap(%d, %d)\n", width, height);
 	return std::make_unique<SurfaceOffscreen>(width, height);
 }
 
@@ -847,7 +847,7 @@ void SurfaceOffscreen::PopClip()
 {
 	Fl_Surface_Device::push_current(&surf);
 	fl_pop_clip();
-	printf("PopClip()\n");
+	//printf("PopClip()\n");
 	Fl_Surface_Device::pop_current();
 }
 
@@ -994,7 +994,7 @@ void SurfaceWidget::SetClip(const PRectangle rect)
 void SurfaceWidget::PopClip()
 {
 	fl_pop_clip();
-	printf("PopClip()\n");
+	//printf("PopClip()\n");
 }
 
 void SurfaceWidget::FlushCachedState()
