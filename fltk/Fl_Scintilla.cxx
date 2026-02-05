@@ -8,6 +8,9 @@ Fl_Scintilla::Fl_Scintilla(int X, int Y, int W, int H, const char* L) :
 	scrollbar_horizontal(X, Y + H - scrollbar_width, W - scrollbar_width, scrollbar_width)
 {
 	scrollbar_horizontal.type(FL_HORIZONTAL);
+	scrollbar_horizontal.minimum(0);
+	scrollbar_vertical.minimum(0);
+	scrollbar_vertical.callback([](Fl_Widget*, void* v) { ((Fl_Scintilla*)v)->scroll_cb(); }, this);
 	wMain = this;
 	CaretSetPeriod(500);
 }
@@ -32,20 +35,37 @@ void Fl_Scintilla::AddToPopUp(const char* const label, const int cmd, const bool
 
 void Fl_Scintilla::SetVerticalScrollPos()
 {
-	//scroll_to(xposition(), topLine);
-	printf("SetVerticalScrollPos(%lld)\n", topLine);
+	Editor::SetVerticalScrollPos();
+	scrollbar_vertical.value(topLine);
+	printf("SetVerticalScrollPos(%lld/%lf)\n", topLine, scrollbar_vertical.maximum());
 }
 
 void Fl_Scintilla::SetHorizontalScrollPos()
 {
-	//scroll_to(yposition(), xOffset);
+	scrollbar_horizontal.value(xOffset);
 	printf("SetHorizontalScrollPos(%d)\n", xOffset);
 }
 
 bool Fl_Scintilla::ModifyScrollBars(const Sci::Line nMax, const Sci::Line nPage)
 {
-	//TODO
-	return false;
+	bool modified = false;
+	if (scrollbar_vertical.maximum() != nMax + 1)
+	{
+		printf("ModifyScrollBars(%lld, %lld, %d, %lld)\n", topLine, nPage, 0, nMax + 1);
+		scrollbar_vertical.value(topLine, nPage, 0, nMax + 1);
+		modified = true;
+	}
+	if (const int nWidth = GetTextRectangle().Width(); scrollbar_horizontal.maximum() != nWidth)
+	{
+		scrollbar_horizontal.maximum(nWidth);
+		modified = true;
+	}
+	return modified;
+}
+
+void Fl_Scintilla::scroll_cb()
+{
+	ScrollTo(scrollbar_vertical.value());
 }
 
 void Fl_Scintilla::ClaimSelection()
@@ -276,11 +296,6 @@ int Fl_Scintilla::handle(int event)
 			printf("Added\n");
 		if (consumed)
 			printf("Consumed\n");
-		if (added || consumed)
-		{
-			//redraw();
-			//return true;
-		}
 		if (key >= FL_KP && key < FL_KP_Last)
 			key -= FL_KP;
 		if (key >= ' ' && key <= '~') //printable ascii characters
@@ -288,9 +303,9 @@ int Fl_Scintilla::handle(int event)
 			if (Fl::event_shift())
 				key = toupper(key);
 			AddChar(key);
-			redraw();
-			return true;
 		}
+		redraw();
+		return true;
 	}
 	return Fl_Widget::handle(event);
 }
