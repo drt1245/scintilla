@@ -68,7 +68,8 @@ private:
 	std::array<double, 5> tick_period; //must match count of TickReason
 	static constexpr int scrollbar_width = 15;
 	Fl_Scrollbar scrollbar_vertical, scrollbar_horizontal;
-	void scroll_cb();
+	void vscroll_cb();
+	void hscroll_cb();
 	Scintilla::Internal::Point get_mouse_position();
 protected:
 	void SetVerticalScrollPos() override;

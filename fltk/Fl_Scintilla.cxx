@@ -9,8 +9,9 @@ Fl_Scintilla::Fl_Scintilla(int X, int Y, int W, int H, const char* L) :
 {
 	scrollbar_horizontal.type(FL_HORIZONTAL);
 	scrollbar_horizontal.minimum(0);
+	scrollbar_horizontal.callback([](Fl_Widget*, void* v) { ((Fl_Scintilla*)v)->hscroll_cb(); }, this);
 	scrollbar_vertical.minimum(0);
-	scrollbar_vertical.callback([](Fl_Widget*, void* v) { ((Fl_Scintilla*)v)->scroll_cb(); }, this);
+	scrollbar_vertical.callback([](Fl_Widget*, void* v) { ((Fl_Scintilla*)v)->vscroll_cb(); }, this);
 	wMain = this;
 	CaretSetPeriod(500);
 }
@@ -51,21 +52,27 @@ bool Fl_Scintilla::ModifyScrollBars(const Sci::Line nMax, const Sci::Line nPage)
 	bool modified = false;
 	if (scrollbar_vertical.maximum() != nMax + 1)
 	{
-		printf("ModifyScrollBars(%lld, %lld, %d, %lld)\n", topLine, nPage, 0, nMax + 1);
+		printf("ModifyScrollBars Vertical(%lld, %lld, %d, %lld)\n", topLine, nPage, 0, nMax + 1);
 		scrollbar_vertical.value(topLine, nPage, 0, nMax + 1);
 		modified = true;
 	}
-	if (const int nWidth = GetTextRectangle().Width(); scrollbar_horizontal.maximum() != nWidth)
+	if (const int nWidth = GetTextRectangle().Width(); scrollbar_horizontal.maximum() != scrollWidth)
 	{
-		scrollbar_horizontal.maximum(nWidth);
+		printf("ModifyScrollBars Horizontal(%d, %d, %d, %d)\n", xOffset, nWidth, 0, scrollWidth);
+		scrollbar_horizontal.value(xOffset, nWidth, 0, scrollWidth);
 		modified = true;
 	}
 	return modified;
 }
 
-void Fl_Scintilla::scroll_cb()
+void Fl_Scintilla::vscroll_cb()
 {
 	ScrollTo(scrollbar_vertical.value());
+}
+
+void Fl_Scintilla::hscroll_cb()
+{
+	HorizontalScrollTo(scrollbar_horizontal.value());
 }
 
 void Fl_Scintilla::ClaimSelection()
