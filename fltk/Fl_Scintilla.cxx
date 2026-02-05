@@ -22,7 +22,7 @@ void Fl_Scintilla::CreateCallTipWindow(Scintilla::Internal::PRectangle rect)
 
 void Fl_Scintilla::menu_cb(Fl_Widget* w, void* v)
 {
-	//TODO: Fl_Widget* parameter is probably null here?
+	//TODO: is Fl_Widget* parameter valid?
 	((Fl_Scintilla*)w)->Command(reinterpret_cast<intptr_t>(v));
 }
 
@@ -30,7 +30,7 @@ void Fl_Scintilla::AddToPopUp(const char* const label, const int cmd, const bool
 {
 	std::vector<Fl_Menu_Item>* menu = static_cast<std::vector<Fl_Menu_Item>*>(popup.GetID());
 	if (menu)
-		menu->emplace_back(label, 0, nullptr, (void*)cmd, enabled ? 0 : FL_MENU_INACTIVE);
+		menu->emplace_back(label, 0, menu_cb, (void*)cmd, enabled ? 0 : FL_MENU_INACTIVE);
 }
 
 void Fl_Scintilla::SetVerticalScrollPos()

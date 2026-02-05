@@ -1031,13 +1031,13 @@ void Menu::Destroy() noexcept
 		mid = nullptr;
 	}
 }
-void Menu::Show(Point pt, const Window& /*w*/)
+void Menu::Show(Point pt, const Window& w)
 {
-	std::vector<Fl_Menu_Item>* menu = static_cast<std::vector<Fl_Menu_Item>*>(mid);
-	if (!menu->empty())
+	if (std::vector<Fl_Menu_Item>* menu = static_cast<std::vector<Fl_Menu_Item>*>(mid);  menu && !menu->empty())
 	{
 		menu->emplace_back(nullptr);
-		menu->at(0).popup(lround(pt.x), lround(pt.y));
+		if (const Fl_Menu_Item* picked = menu->at(0).popup(lround(pt.x), lround(pt.y)); picked)
+			picked->do_callback(static_cast<Fl_Widget*>(w.GetID()));
 	}
 	Destroy();
 }
