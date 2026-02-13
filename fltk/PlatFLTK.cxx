@@ -609,7 +609,7 @@ void SurfaceFLTK::Copy(const PRectangle rect, const Point from, Surface& src_)
 {
 	//printf("Copy([%lf, %lf, %lf, %lf], [%lf, %lf])\n", rect.left, rect.top, rect.Width(), rect.Height(), from.x, from.y);
 	if (SurfaceOffscreen* src = dynamic_cast<SurfaceOffscreen*>(&src_); src)
-		src->surf.image()->draw(lround(rect.left), lround(rect.top), lround(rect.Width()), lround(rect.Height()), lround(from.x), lround(from.y));
+		fl_copy_offscreen(lround(rect.left), lround(rect.top), lround(rect.Width()), lround(rect.Height()), src->surf.offscreen(), lround(from.x), lround(from.y));
 	else
 		return; //TODO
 }
