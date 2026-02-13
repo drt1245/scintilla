@@ -57,9 +57,10 @@
 #include "ScintillaBase.h"
 #include "CaseConvert.h"
 
+#include <FL/Fl_Group.H>
 #include <FL/Fl_Scrollbar.H>
 
-class Fl_Scintilla : public Fl_Widget, public Scintilla::Internal::ScintillaBase
+class Fl_Scintilla : public Fl_Group, public Scintilla::Internal::ScintillaBase
 {
 private:
 	static void menu_cb(Fl_Widget*, void*);
@@ -97,4 +98,5 @@ public:
 	virtual ~Fl_Scintilla() = default;
 	void draw() override;
 	int handle(int) override;
+	void resize(int X, int Y, int W, int H) override;
 };

@@ -1,5 +1,7 @@
 ﻿cmake_minimum_required (VERSION 3.12)
 
+add_compile_definitions(_ITERATOR_DEBUG_LEVEL=0)
+
 if (WIN32)
 	add_compile_options(/W4 /Zi)
 else()

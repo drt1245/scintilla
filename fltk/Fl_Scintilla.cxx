@@ -3,10 +3,11 @@
 #include <FL/Fl_Menu_Item.H>
 
 Fl_Scintilla::Fl_Scintilla(int X, int Y, int W, int H, const char* L) :
-	Fl_Widget(X, Y, W, H, L),
+	Fl_Group(X, Y, W, H, L),
 	scrollbar_vertical(X + W - scrollbar_width, Y, scrollbar_width, H - scrollbar_width),
 	scrollbar_horizontal(X, Y + H - scrollbar_width, W - scrollbar_width, scrollbar_width)
 {
+	end(); //do not add more Fl_Widgets to this group
 	scrollbar_horizontal.type(FL_HORIZONTAL);
 	scrollbar_horizontal.minimum(0);
 	scrollbar_horizontal.callback([](Fl_Widget*, void* v) { ((Fl_Scintilla*)v)->hscroll_cb(); }, this);
@@ -14,6 +15,7 @@ Fl_Scintilla::Fl_Scintilla(int X, int Y, int W, int H, const char* L) :
 	scrollbar_vertical.callback([](Fl_Widget*, void* v) { ((Fl_Scintilla*)v)->vscroll_cb(); }, this);
 	wMain = this;
 	CaretSetPeriod(500);
+	//WndProc(Scintilla::Message::SetMarginWidthN, 0, 40);
 }
 
 void Fl_Scintilla::CreateCallTipWindow(Scintilla::Internal::PRectangle rect)
@@ -130,9 +132,9 @@ std::string Fl_Scintilla::EncodedFromUTF8(const std::string_view utf8) const
 	return std::string{ utf8 };
 }
 
-Scintilla::sptr_t Fl_Scintilla::DefWndProc(Scintilla::Message, Scintilla::uptr_t, Scintilla::sptr_t)
+Scintilla::sptr_t Fl_Scintilla::DefWndProc(Scintilla::Message msg, Scintilla::uptr_t x, Scintilla::sptr_t y)
 {
-	return 0;
+	return ScintillaBase::WndProc(msg, x, y);
 }
 
 template<Scintilla::Internal::Editor::TickReason reason>
@@ -213,6 +215,7 @@ void Fl_Scintilla::draw()
 	Scintilla::Internal::AutoSurface surf(this);
 	Editor::Paint(surf, Scintilla::Internal::PRectangle{0, 0, (double)w() - scrollbar_width, (double)h() - scrollbar_width });
 	paintState = PaintState::notPainting;
+	Fl_Group::draw();
 }
 
 static Scintilla::Keys fl_keys_to_scintilla(const int key)
@@ -261,9 +264,10 @@ Scintilla::Internal::Point Fl_Scintilla::get_mouse_position()
 	);
 }
 
-int Fl_Scintilla::handle(int event)
+int Fl_Scintilla::handle(const int event)
 {
-	switch (Fl::event())
+	const int retval = Fl_Group::handle(event);
+	switch (event)
 	{
 	case FL_FOCUS:
 		SetFocusState(true);
@@ -271,16 +275,21 @@ int Fl_Scintilla::handle(int event)
 	case FL_UNFOCUS:
 		SetFocusState(false);
 		return true;
+	case FL_ENTER:
+	case FL_LEAVE:
+		return true;
 	case FL_PUSH:
+		take_focus();
 		switch (Fl::event_button())
 		{
 		case FL_LEFT_MOUSE:
 			ButtonDownWithModifiers(get_mouse_position(), 0, get_modifiers());
-			return true;
+			break;
 		case FL_RIGHT_MOUSE:
 			RightButtonDownWithModifiers(get_mouse_position(), 0, get_modifiers());
+			break;
 		}
-		break;
+		return true;
 	case FL_RELEASE:
 		if (Fl::event_button() == FL_LEFT_MOUSE)
 		{
@@ -296,6 +305,7 @@ int Fl_Scintilla::handle(int event)
 		}
 		break;
 	case FL_KEYDOWN:
+		//TODO: use Fl::compose()
 		bool consumed;
 		int key = Fl::event_key();
 		const bool added = KeyDownWithModifiers(fl_keys_to_scintilla(key), get_modifiers(), &consumed);
@@ -310,9 +320,19 @@ int Fl_Scintilla::handle(int event)
 			if (Fl::event_shift())
 				key = toupper(key);
 			AddChar(key);
+			consumed = true;
 		}
 		redraw();
-		return true;
+		return consumed || added;
 	}
-	return Fl_Widget::handle(event);
+	return retval;
+}
+
+void Fl_Scintilla::resize(const int X, const int Y, const int W, const int H)
+{
+	Fl_Widget::resize(X, Y, W, H);
+	scrollbar_vertical.resize(X + W - scrollbar_width, Y, scrollbar_width, H - scrollbar_width);
+	scrollbar_horizontal.resize(X, Y + H - scrollbar_width, W - scrollbar_width, scrollbar_width);
+	this->needUpdateUI = Scintilla::Update::Content;
+	NotifyUpdateUI(); //TODO: is this the correct way to notify scintilla that the window was resized?
 }
