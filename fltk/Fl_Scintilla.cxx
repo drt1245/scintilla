@@ -284,7 +284,8 @@ Scintilla::Internal::Point Fl_Scintilla::get_mouse_position()
 
 int Fl_Scintilla::handle(const int event)
 {
-	const int retval = Fl_Group::handle(event);
+	if (Fl_Group::handle(event))
+		return true;
 	switch (event)
 	{
 	case FL_FOCUS:
@@ -323,27 +324,21 @@ int Fl_Scintilla::handle(const int event)
 		}
 		break;
 	case FL_KEYDOWN:
-		//TODO: use Fl::compose()
-		bool consumed;
-		int key = Fl::event_key();
-		const bool added = KeyDownWithModifiers(fl_keys_to_scintilla(key), get_modifiers(), &consumed);
-		if (added)
-			printf("Added\n");
-		if (consumed)
-			printf("Consumed\n");
-		if (key >= FL_KP && key < FL_KP_Last)
-			key -= FL_KP;
-		if (key >= ' ' && key <= '~') //printable ascii characters
+		if (bool consumed, added = KeyDownWithModifiers(fl_keys_to_scintilla(Fl::event_key()), get_modifiers(), &consumed); added || consumed)
+			return true;
+		if (int del; Fl::compose(del)) //TODO: call Fl::compose_reset() somewhere?
 		{
-			if (Fl::event_shift())
-				key = toupper(key);
-			AddChar(key);
-			consumed = true;
+			InsertCharacter({ Fl::event_text(), (size_t)Fl::event_length() }, Scintilla::CharacterSource::DirectInput);
+			redraw();
+			return true;
 		}
+		break;
+	case FL_PASTE:
+		InsertCharacter({ Fl::event_text(), (size_t)Fl::event_length() }, Scintilla::CharacterSource::DirectInput);
 		redraw();
-		return consumed || added;
+		return true;
 	}
-	return retval;
+	return false;
 }
 
 void Fl_Scintilla::resize(const int X, const int Y, const int W, const int H)
