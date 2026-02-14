@@ -58,13 +58,13 @@ void Fl_Scintilla::SetVerticalScrollPos()
 {
 	Editor::SetVerticalScrollPos();
 	scrollbar_vertical.value(topLine);
-	printf("SetVerticalScrollPos(%lld/%lf)\n", topLine, scrollbar_vertical.maximum());
+	//printf("SetVerticalScrollPos(%lld/%lf)\n", topLine, scrollbar_vertical.maximum());
 }
 
 void Fl_Scintilla::SetHorizontalScrollPos()
 {
 	scrollbar_horizontal.value(xOffset);
-	printf("SetHorizontalScrollPos(%d)\n", xOffset);
+	//printf("SetHorizontalScrollPos(%d)\n", xOffset);
 }
 
 bool Fl_Scintilla::ModifyScrollBars(const Sci::Line nMax, const Sci::Line nPage)
@@ -72,13 +72,13 @@ bool Fl_Scintilla::ModifyScrollBars(const Sci::Line nMax, const Sci::Line nPage)
 	bool modified = false;
 	if (scrollbar_vertical.maximum() != nMax + 1)
 	{
-		printf("ModifyScrollBars Vertical(%lld, %lld, %d, %lld)\n", topLine, nPage, 0, nMax + 1);
+		//printf("ModifyScrollBars Vertical(%lld, %lld, %d, %lld)\n", topLine, nPage, 0, nMax + 1);
 		scrollbar_vertical.value(topLine, nPage, 0, nMax + 1);
 		modified = true;
 	}
 	if (const int nWidth = GetTextRectangle().Width(); scrollbar_horizontal.maximum() != scrollWidth)
 	{
-		printf("ModifyScrollBars Horizontal(%d, %d, %d, %d)\n", xOffset, nWidth, 0, scrollWidth);
+		//printf("ModifyScrollBars Horizontal(%d, %d, %d, %d)\n", xOffset, nWidth, 0, scrollWidth);
 		scrollbar_horizontal.value(xOffset, nWidth, 0, scrollWidth);
 		modified = true;
 	}
