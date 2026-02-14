@@ -67,6 +67,7 @@ private:
 	template<Scintilla::Internal::Editor::TickReason reason>
 	static void timeout_cb(void*);
 	std::array<double, 5> tick_period; //must match count of TickReason
+	static void idle_cb(void*);
 	static constexpr int scrollbar_width = 15;
 	Fl_Scrollbar scrollbar_vertical, scrollbar_horizontal;
 	void vscroll_cb();
@@ -95,7 +96,7 @@ protected:
 	void FineTickerCancel(Scintilla::Internal::Editor::TickReason reason) override;
 public:
 	Fl_Scintilla(int X, int Y, int W, int H, const char *L = nullptr);
-	virtual ~Fl_Scintilla() = default;
+	~Fl_Scintilla() override;
 	void draw() override;
 	int handle(int) override;
 	void resize(int X, int Y, int W, int H) override;

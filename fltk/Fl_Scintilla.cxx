@@ -16,6 +16,24 @@ Fl_Scintilla::Fl_Scintilla(int X, int Y, int W, int H, const char* L) :
 	wMain = this;
 	CaretSetPeriod(500);
 	//WndProc(Scintilla::Message::SetMarginWidthN, 0, 40);
+	Fl::add_timeout(0.1, idle_cb, this);
+}
+
+Fl_Scintilla::~Fl_Scintilla()
+{
+	Fl::remove_timeout(idle_cb, this);
+	FineTickerCancel(Scintilla::Internal::Editor::TickReason::caret);
+	FineTickerCancel(Scintilla::Internal::Editor::TickReason::dwell);
+	FineTickerCancel(Scintilla::Internal::Editor::TickReason::platform);
+	FineTickerCancel(Scintilla::Internal::Editor::TickReason::scroll);
+	FineTickerCancel(Scintilla::Internal::Editor::TickReason::widen);
+}
+
+void Fl_Scintilla::idle_cb(void* v)
+{
+	//TODO: calling this with Fl::add_idle() results in high CPU usage. what should period be?
+	((Fl_Scintilla*)v)->Idle(); //TODO: call IdleWork() instead? Or other idle function?
+	Fl::repeat_timeout(0.1, idle_cb, v);
 }
 
 void Fl_Scintilla::CreateCallTipWindow(Scintilla::Internal::PRectangle rect)
