@@ -100,8 +100,9 @@ void Window::InvalidateAll()
 
 void Window::InvalidateRectangle(const PRectangle rc)
 {
+	//printf("InvalidateRectangle(%lf, %lf, %lf, %lf)\n", rc.left, rc.top, rc.Width(), rc.Height());
 	if (wid)
-		((Fl_Widget*)wid)->damage(FL_DAMAGE_ALL, lround(rc.left), lround(rc.top), lround(rc.Width()), lround(rc.Height()));
+		((Fl_Widget*)wid)->damage(FL_DAMAGE_ALL, ((Fl_Widget*)wid)->x() + lround(rc.left), ((Fl_Widget*)wid)->y() + lround(rc.top), lround(rc.Width()), lround(rc.Height()));
 }
 
 void Window::SetCursor(const Cursor curs)
