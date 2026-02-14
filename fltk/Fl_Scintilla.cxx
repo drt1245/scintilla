@@ -346,6 +346,6 @@ void Fl_Scintilla::resize(const int X, const int Y, const int W, const int H)
 	Fl_Widget::resize(X, Y, W, H);
 	scrollbar_vertical.resize(X + W - scrollbar_width, Y, scrollbar_width, H - scrollbar_width);
 	scrollbar_horizontal.resize(X, Y + H - scrollbar_width, W - scrollbar_width, scrollbar_width);
-	this->needUpdateUI = Scintilla::Update::Content;
-	NotifyUpdateUI(); //TODO: is this the correct way to notify scintilla that the window was resized?
+	InvalidateStyleRedraw();
+	redraw();
 }
