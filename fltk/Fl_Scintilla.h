@@ -81,7 +81,6 @@ protected:
 	void Paste() override;
 	void ClaimSelection() override;
 	void NotifyChange() override;
-	void NotifyParent(Scintilla::NotificationData scn) override;
 	void CopyToClipboard(const Scintilla::Internal::SelectionText& selectedText) override;
 	bool HaveMouseCapture() override;
 	void SetMouseCapture(bool on) override;

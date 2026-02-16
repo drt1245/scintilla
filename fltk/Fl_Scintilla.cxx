@@ -105,11 +105,6 @@ void Fl_Scintilla::NotifyChange()
 	//TODO
 }
 
-void Fl_Scintilla::NotifyParent(const Scintilla::NotificationData scn)
-{
-	//TODO
-}
-
 void Fl_Scintilla::Copy()
 {
 	if (!sel.Empty())
