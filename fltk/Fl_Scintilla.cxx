@@ -15,7 +15,6 @@ Fl_Scintilla::Fl_Scintilla(int X, int Y, int W, int H, const char* L) :
 	scrollbar_vertical.callback([](Fl_Widget*, void* v) { ((Fl_Scintilla*)v)->vscroll_cb(); }, this);
 	wMain = this;
 	CaretSetPeriod(500);
-	//WndProc(Scintilla::Message::SetMarginWidthN, 0, 40);
 	Fl::add_timeout(0.1, idle_cb, this);
 }
 
@@ -36,22 +35,24 @@ void Fl_Scintilla::idle_cb(void* v)
 	Fl::repeat_timeout(0.1, idle_cb, v);
 }
 
-void Fl_Scintilla::CreateCallTipWindow(Scintilla::Internal::PRectangle rect)
+void Fl_Scintilla::CreateCallTipWindow(const Scintilla::Internal::PRectangle rect)
 {
-	//TODO
+	if (!ct.wCallTip.Created())
+		ct.wCallTip = new Fl_Window(rect.left, rect.top, rect.Width(), rect.Height());
 }
 
 void Fl_Scintilla::menu_cb(Fl_Widget* w, void* v)
 {
-	//TODO: is Fl_Widget* parameter valid?
 	((Fl_Scintilla*)w)->Command(reinterpret_cast<intptr_t>(v));
 }
 
 void Fl_Scintilla::AddToPopUp(const char* const label, const int cmd, const bool enabled)
 {
-	std::vector<Fl_Menu_Item>* menu = static_cast<std::vector<Fl_Menu_Item>*>(popup.GetID());
-	if (menu)
-		menu->emplace_back(label, 0, menu_cb, (void*)cmd, enabled ? 0 : FL_MENU_INACTIVE);
+	if (std::vector<Fl_Menu_Item>* menu = static_cast<std::vector<Fl_Menu_Item>*>(popup.GetID()); menu)
+		if (label && label[0] != '\0')
+			menu->emplace_back(label, 0, menu_cb, (void*)cmd, enabled ? 0 : FL_MENU_INACTIVE);
+		else if (!menu->empty()) //empty label indicates divider
+			menu->back().flags |= FL_MENU_DIVIDER;
 }
 
 void Fl_Scintilla::SetVerticalScrollPos()
@@ -300,7 +301,10 @@ int Fl_Scintilla::handle(const int event)
 			ButtonDownWithModifiers(get_mouse_position(), 0, get_modifiers());
 			break;
 		case FL_RIGHT_MOUSE:
-			RightButtonDownWithModifiers(get_mouse_position(), 0, get_modifiers());
+			if(const auto pos = get_mouse_position(); pos.x < WndProc(Scintilla::Message::GetMarginWidthN, 0, 0) + vs.fixedColumnWidth)
+				RightButtonDownWithModifiers(pos, 0, get_modifiers());
+			else
+				ScintillaBase::ContextMenu(pos);
 			break;
 		}
 		return true;

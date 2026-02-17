@@ -1034,11 +1034,12 @@ void Menu::Destroy() noexcept
 }
 void Menu::Show(Point pt, const Window& w)
 {
-	if (std::vector<Fl_Menu_Item>* menu = static_cast<std::vector<Fl_Menu_Item>*>(mid);  menu && !menu->empty())
+	Fl_Widget* widget = static_cast<Fl_Widget*>(w.GetID());
+	if (std::vector<Fl_Menu_Item>* menu = static_cast<std::vector<Fl_Menu_Item>*>(mid); widget && menu && !menu->empty())
 	{
 		menu->emplace_back(nullptr);
-		if (const Fl_Menu_Item* picked = menu->at(0).popup(lround(pt.x), lround(pt.y)); picked)
-			picked->do_callback(static_cast<Fl_Widget*>(w.GetID()));
+		if (const Fl_Menu_Item* picked = menu->at(0).popup(widget->x() + lround(pt.x), widget->y() + lround(pt.y)); picked)
+			picked->do_callback(widget);
 	}
 	Destroy();
 }
