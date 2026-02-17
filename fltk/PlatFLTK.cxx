@@ -1058,7 +1058,7 @@ ColourRGBA Platform::ChromeHighlight()
 
 const char* Platform::DefaultFont()
 {
-	return Fl::get_font_name(FL_HELVETICA); //TODO: is FL_HELVETICA correct?
+	return Fl::get_font_name(FL_COURIER);//TODO: default fltk font is Helvetica, but for Scintilla, a monospaced font seems more appropriate
 }
 
 int Platform::DefaultFontSize()
