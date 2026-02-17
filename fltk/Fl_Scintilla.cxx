@@ -1,6 +1,27 @@
 #include "Fl_Scintilla.h"
 
 #include <FL/Fl_Menu_Item.H>
+#include <FL/Fl_Window.H>
+
+class Fl_CallTip : public Fl_Widget
+{
+private:
+	Scintilla::Internal::CallTip& ct;
+public:
+	Fl_CallTip(Scintilla::Internal::CallTip& ct_, int X, int Y, int W, int H, const char* L = nullptr) :ct(ct_),  Fl_Widget(X, Y, W, H, L)
+	{}
+
+	void draw() override
+	{
+		if (ct.inCallTipMode)
+		{
+			std::unique_ptr<Scintilla::Internal::Surface> surfaceWindow = Scintilla::Internal::Surface::Allocate(Scintilla::Technology::Default);
+			surfaceWindow->Init(this);
+			surfaceWindow->SetMode(Scintilla::Internal::SurfaceMode(ct.codePage, false));
+			ct.PaintCT(surfaceWindow.get());
+		}
+	}
+};
 
 Fl_Scintilla::Fl_Scintilla(int X, int Y, int W, int H, const char* L) :
 	Fl_Group(X, Y, W, H, L),
@@ -38,7 +59,7 @@ void Fl_Scintilla::idle_cb(void* v)
 void Fl_Scintilla::CreateCallTipWindow(const Scintilla::Internal::PRectangle rect)
 {
 	if (!ct.wCallTip.Created())
-		ct.wCallTip = new Fl_Window(rect.left, rect.top, rect.Width(), rect.Height());
+		ct.wCallTip = new Fl_CallTip(ct, x() + rect.left, y() + rect.top, rect.Width(), rect.Height());
 }
 
 void Fl_Scintilla::menu_cb(Fl_Widget* w, void* v)
