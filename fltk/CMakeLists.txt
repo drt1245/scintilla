@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required (VERSION 3.12)
 
-add_compile_definitions(_ITERATOR_DEBUG_LEVEL=0)
+SET(FLTK_DIR "C:\\Users\\dtarry\\Downloads\\fltk-1.4.1\\build")
 
 if (WIN32)
 	add_compile_options(/W4 /Zi)
