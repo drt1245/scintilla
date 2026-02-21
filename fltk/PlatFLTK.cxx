@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <cmath>
 
 #include <functional>
 #include <map>
@@ -10,7 +11,7 @@
 #include <vector>
 #include <stdarg.h>
 
-#include <FL/fl_ask.H> 
+#include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Image_Surface.H>
 #include <FL/Fl_Menu_Item.H>
